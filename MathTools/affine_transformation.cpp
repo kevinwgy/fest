@@ -24,7 +24,7 @@ void MathTools::affine_transformation(int n, int dim, double in[], double out[])
 
       if(std::abs(max(j) - min(j)) < 1e-8) {
         output(i, j) = 0.0;
-	continue;
+      	continue;
       }
       output(i, j) = (input(i, j) - min(j)) / (max(j) - min(j));
 

@@ -140,7 +140,7 @@ InterpolatedLoadOperator::ComputeForces(TriangulatedSurface &surface,
   }
 
   vector<vector<Vec3D>> neighbor_forces(num_points, 
-                                        vector<Vec3D>(active_nodes, Vec3D(0.0)));
+    vector<Vec3D>(active_nodes, Vec3D(0.0)));
 
   for(int i=0; i<num_points; ++i) {
 
@@ -179,8 +179,6 @@ InterpolatedLoadOperator::ComputeForces(TriangulatedSurface &surface,
   }
 
   InterpolateInMetaSpace(surface, neighbor_forces, force, force_over_area);
-
-  if(t==2.5e-4) exit_mpi();
 
 }
 
@@ -327,15 +325,12 @@ InterpolatedLoadOperator::InterpolateInMetaSpace(
 
     vector<double> weight(num_points, -1.0);
     vector<double> interp(1, -1.0);
-/*
-    MathTools::rbf_weight(var_dim, num_points, xd, r0, phi, fd, weight.data());
-    MathTools::rbf_interp(var_dim, num_points, xd, r0, phi, weight.data(), 1,
-                          target.data(), interp.data());
-*/
+    // MathTools::rbf_weight(var_dim, num_points, xd, r0, phi, fd, weight.data());
+    // MathTools::rbf_interp(var_dim, num_points, xd, r0, phi, weight.data(), 1,
+    //                       target.data(), interp.data());
 
-    MathTools::weighted_interp(var_dim, num_points, xd, fd, 1, target.data(), 
-                               interp.data());
-
+    MathTools::weighted_interp(var_dim, num_points, xd, r0, phi, fd, 1, 
+                               target.data(), interp.data());
 
     pressure[index] = interp[0];
 
@@ -447,14 +442,12 @@ InterpolatedLoadOperator::InterpolateInMetaSpace(
 
     vector<double> weight(num_points, -1.0);
     vector<double> interp(1, -1.0);
-/*
-    MathTools::rbf_weight(var_dim, num_points, xd, r0, phi, fd, weight.data());
-    MathTools::rbf_interp(var_dim, num_points, xd, r0, phi, weight.data(), 1,
-                          target.data(), interp.data());
-*/
+    // MathTools::rbf_weight(var_dim, num_points, xd, r0, phi, fd, weight.data());
+    // MathTools::rbf_interp(var_dim, num_points, xd, r0, phi, weight.data(), 1,
+    //                       target.data(), interp.data());
 
-    MathTools::weighted_interp(var_dim, num_points, xd, fd, 1, target.data(), 
-                               interp.data());
+    MathTools::weighted_interp(var_dim, num_points, xd, r0, phi, fd, 1, 
+                               target.data(), interp.data());
 
     force[index]           = interp[0]*area*normal;   
     force_over_area[index] = interp[0]*normal;

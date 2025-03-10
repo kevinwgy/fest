@@ -272,6 +272,18 @@ void rbf_weight ( int m, int nd, double xd[], double r0,
   Eigen::VectorXd x(nd, 1);
   x = A.colPivHouseholderQr().solve(b);
 
+  // double lambda = 100.0;
+  // Eigen::MatrixXd tmp(nd, nd);
+  // Eigen::VectorXd xtmp(nd, 1);
+  // for (int i=0; i<10; ++i) {
+  //   tmp = A + lambda*Eigen::MatrixXd::Identity(nd,nd);
+  //   xtmp = tmp.colPivHouseholderQr().solve(b);
+  //   double err = ((xtmp - x).norm())/(x.norm());
+  //   x = xtmp;
+  //   if(err<1e-3) break;
+  //   lambda *= 0.1;
+  // }
+  
   for (int j=0; j<nd; ++j)
     w[j] = x(j); 
 
