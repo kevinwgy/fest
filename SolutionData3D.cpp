@@ -81,13 +81,30 @@ SolutionData3D::GetTimeBracket(double time)
 {
 
   assert(data_ptr); // should not be null
-  auto range = data_ptr->equal_range(time);
 
-  if(range.first == data_ptr->end() or
-     range.second == data_ptr->end()) {
-    print_error("*** Error: Time %e out of bounds.\n", time);
-    exit_mpi();
+  auto first = data_ptr->begin();
+  auto last  = data_ptr->rbegin();
+
+  //-----------------------------------
+  // time out-of-bounds (left)
+  //-----------------------------------
+  if(time <= first->first) {
+    auto other = std::next(first);
+    return {first->first, other->first};
   }
+
+  //-----------------------------------
+  // time out-of-bounds (right)
+  //-----------------------------------
+  if(time >= last->first) {
+    auto other = std::prev(last);
+    return {other->first, last->first};
+  }
+
+  //-----------------------------------
+  // Within bounds
+  //----------------------------------
+  auto range = data_ptr->equal_range(time);
 
   double t0 = range.first->first;
   double t1 = range.second->first;
@@ -107,7 +124,7 @@ SolutionData3D::GetTimeBracket(double time)
   t0 = low->first;
   t1 = upp->first;
 
-  return std::array<double,2>{t0, t1};
+  return {t0, t1};
 
 }
 

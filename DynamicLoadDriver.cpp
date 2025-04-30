@@ -15,7 +15,7 @@ DynamicLoadDriver::DynamicLoadDriver(IoData &iod_,
                                      ConcurrentProgramsHandler &concurrent_)
                  : DynamicDriver(iod_, comm_), concurrent(concurrent_)
 {
-  assert(!concurrent.Coupled());
+  assert(concurrent.Coupled());
 }
 
 //------------------------------------------------------------
@@ -78,7 +78,11 @@ void DynamicLoadDriver::Run()
     print("Step %d: t = %e, dt = %e. Computation time: %.4e s.\n", 
           time_step, t, dt, walltime()-start_time);
  
+    double refer_time = walltime();
     ComputeForces(surface, force, force_over_area, t); 
+    if(verbose>0)
+      print("- Step computation time: %.4e s.\n", walltime()-refer_time);
+
     
     if(t<tmax) {
       if(time_step==1)

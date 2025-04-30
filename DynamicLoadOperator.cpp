@@ -102,12 +102,16 @@ DynamicLoadOperator::ComputeError(std::vector<double> &pressure,
   auto time_bounds = true_solution->GetTimeBounds();
 
   if(t<time_bounds[0]) {
-    tk = tkp = time_bounds[0];
+    auto bracket = true_solution->GetTimeBracket(time_bounds[0]);
+    tk = bracket[0];
+    tkp = bracket[1];
     print_warning("- Warning: Calculating error at %e by const extrapolation "
                   "(outside data interval [%e,%e]).\n", t, time_bounds[0], time_bounds[1]);
   }
   else if(t>time_bounds[1]) {
-    tk = tkp = time_bounds[1];
+    auto bracket = true_solution->GetTimeBracket(time_bounds[1]);
+    tk = bracket[0];
+    tkp = bracket[1];
     print_warning("- Warning: Calculating error at %e by const extrapolation "
                   "(outside data interval [%e,%e]).\n", t, time_bounds[0], time_bounds[1]);
   }
