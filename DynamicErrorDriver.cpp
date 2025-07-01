@@ -72,7 +72,7 @@ void DynamicErrorDriver::Run()
  
     ComputePressures(surface, pressure, t);
 
-    double error_step;
+    double error_step = 0;
     ComputeError(pressure, t, error_step);
     error += error_step;
     if(verbose>1) print("  - Error: %e\n", error_step);

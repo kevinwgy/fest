@@ -124,6 +124,10 @@ ConcurrentProgramsHandler::Destroy()
 {
   if(aeros)
     aeros->Destroy();
+
+  for(int i=0; i<(int)c.size(); i++)
+    MPI_Comm_free(&c[i]);
+
 }
 
 //---------------------------------------------------------

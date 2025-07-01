@@ -167,31 +167,31 @@ FileHandler3D::ReadMetaFile()
     // just check the first four letters
     if(!(word.compare(0, 4, "Type", 0, 4) and
          word.compare(0, 4, "TYPE", 0, 4) and
-	 word.compare(0, 4, "type", 0, 4))) {
+	       word.compare(0, 4, "type", 0, 4))) {
       field2col[TYPE] = column;
       column += 1;
     }
     else if(!(word.compare(0, 4, "Directory", 0, 4) and
               word.compare(0, 4, "DIRECTORY", 0, 4) and
-	      word.compare(0, 4, "directory", 0, 4))) {
+	            word.compare(0, 4, "directory", 0, 4))) {
       field2col[DIRECTORY] = column;
       column += 1;
     }
     else if(!(word.compare(0, 4, "Mesh", 0, 4) and
               word.compare(0, 4, "MESH", 0, 4) and
-	      word.compare(0, 4, "mesh", 0, 4))) {
+	            word.compare(0, 4, "mesh", 0, 4))) {
       field2col[MESH_FILE] = column;
       column += 1;
     }
     else if(!(word.compare(0, 4, "Solution", 0, 4) and
               word.compare(0, 4, "SOLUTION", 0, 4) and
-	      word.compare(0, 4, "solution", 0, 4))) {
+	            word.compare(0, 4, "solution", 0, 4))) {
       field2col[SOLUTION_FILE] = column;
       column += 1;
     }
     else if(!(word.compare(0, 4, "Parameters", 0, 4) and
               word.compare(0, 4, "PARAMETERS", 0, 4) and
-	      word.compare(0, 4, "parameters", 0, 4))) {
+	            word.compare(0, 4, "parameters", 0, 4))) {
       found_parameters = true;
       field2col[PARAMETER_START] = column;
       column += 1;
@@ -214,7 +214,7 @@ FileHandler3D::ReadMetaFile()
     exit_mpi();
   }
 
-  //Line #3 (and onwards) - directory, meshfile, solutionfile, parameter#1, ..., parameter#N
+  //Line #3 (and onwards) -- type, directory, meshfile, solutionfile, parameter#1, ..., parameter#N
   int num_targets = 0;
   while(getline(input, line)) {
     std::istringstream is(line);
@@ -246,7 +246,7 @@ FileHandler3D::ReadMetaFile()
       if(num_targets == 1) {
         print_warning("- Warning: Multiple target meta points found in the meta file. "
                       "Using the first one and ignoring rest.\n");
-	continue;
+	      continue;
       }
 
       points[TARGET].resize(0); // remove previous data (if any)
@@ -262,10 +262,8 @@ FileHandler3D::ReadMetaFile()
 
     }
     else {
-
       print_error("*** Error: I do not understand type \"%s\".\n", type);
       exit_mpi();
-
     }
   }
 
@@ -277,30 +275,31 @@ FileHandler3D::ReadMetaFile()
   if(iod_meta.numPoints != (int)points[NEIGHBOR].size()) {
     print_warning("- Warning: The number of interpolation points specified in "
                   "the input file is %d. However, only %d points are provided in "
-		  "the metafile. Using %d points for interpolation instead.\n",
-		  iod_meta.numPoints, points[NEIGHBOR].size(), points[NEIGHBOR].size());
+		              "the metafile. Using %d points for interpolation instead.\n",
+		              iod_meta.numPoints, points[NEIGHBOR].size(), points[NEIGHBOR].size());
     iod_meta.numPoints = points[NEIGHBOR].size();
   }
 
   // check the size of each parameter
   int dim = points[TARGET][0].GetDim();
   int error = 0;
-  for(int i=0; i<(int)points[NEIGHBOR].size(); ++i)
+  for(int i=0; i<(int)points[NEIGHBOR].size(); ++i) {
     if(dim != points[NEIGHBOR][i].GetDim()) {
       print_error("*** Error: Parameter dimension of \"%s\" does not match the target parameters.\n",
                   points[NEIGHBOR][i].GetPointDirectory().c_str());
       error++;
     }
+  }
 
-  if(error>0) exit_mpi();
+  if(error>0) {
+    exit_mpi();
+  }
 
   // sort the parameters based on distance from target parameter.
   vector<pair<double, int>> dist2target;
   for(int i=0; i<(int)points[NEIGHBOR].size(); ++i) {
- 
     double dist = points[TARGET][0].GetDistance(points[NEIGHBOR][i]);
     dist2target.push_back(std::make_pair(dist, i));
-
   }
 
   sort(dist2target.begin(), dist2target.end());

@@ -12,11 +12,11 @@ extern int verbose;
 
 //------------------------------------------------------------
 
-DynamicLoadOperator::DynamicLoadOperator(IoData &iod_, MPI_Comm &comm_)
-                    : iod_meta(iod_.calculator.meta_input),
-		      iod_spatial(iod_.calculator.spatial_interp),
-		      comm(comm_), file_handler(iod_meta, comm),
-		      true_solution(nullptr), npo(nullptr)
+DynamicLoadOperator::DynamicLoadOperator(IoData &iod, MPI_Comm &comm_)
+                    : iod_meta(iod.calculator.meta_input),
+		                  iod_spatial(iod.calculator.spatial_interp),
+		                  comm(comm_), file_handler(iod_meta, comm_),
+		                  true_solution(nullptr), npo(nullptr)
 {
 
   switch(iod_spatial.type) {
@@ -42,7 +42,14 @@ DynamicLoadOperator::DynamicLoadOperator(IoData &iod_, MPI_Comm &comm_)
     }
   }
 
-  if(file_handler.GetSolnFileForTarget() != "") {
+  //! Only need to load target when computing surface loads for
+  //! normalized mean squared error estimates.
+  if(iod.calculator.mode == DynamicLoadCalculatorData::ERROR) {
+    
+    if(file_handler.GetSolnFileForTarget() == "") {
+      print_error("*** Error: Solution file for TARGET design not provided.\n");
+      exit_mpi();
+    }
 
     true_solution   = new SolutionData3D();
     string filename = file_handler.GetSolnFileForTarget();
@@ -159,7 +166,6 @@ DynamicLoadOperator::ComputeError(std::vector<double> &pressure,
   double denominator = 0.0; 
   int index = my_start_index;
   for(int iter=0; iter<my_block_size; ++iter) {
-    // add small value to avoid division by zero
     double computed_value   = pressure[index];
     double reference_value  = S[index].norm(); 
 
@@ -176,7 +182,7 @@ DynamicLoadOperator::ComputeError(std::vector<double> &pressure,
   MPI_Allreduce(  &numerator,   &global_numerator, 1, MPI_DOUBLE, MPI_SUM, comm);
   MPI_Allreduce(&denominator, &global_denominator, 1, MPI_DOUBLE, MPI_SUM, comm);
 
-  double nrmse = std::sqrt(global_numerator/global_denominator);
+  double nrmse = std::sqrt((global_numerator+1e-6)/(global_denominator+1e-6));
   return nrmse;
 
 }

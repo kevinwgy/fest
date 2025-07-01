@@ -187,6 +187,7 @@ struct SpatialInterpolationData {
 
 struct DynamicLoadCalculatorData {
 
+  enum Mode {LOAD = 0, ERROR = 1} mode;
   enum Type {NONE = 0, CONSTANT, CLOSEST, INTERP} type;
 
   enum VerbosityLevel {LOW = 0, MEDIUM = 1, HIGH = 2} verbose;

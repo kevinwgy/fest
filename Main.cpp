@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 
   //! Special tool for nearest neighbor pressure interpolations.
   std::shared_ptr<DynamicDriver> driver;
-  if(concurrent.Coupled())
+  if(iod.calculator.mode == DynamicLoadCalculatorData::LOAD)
     driver = std::make_shared<DynamicLoadDriver>(iod, comm, concurrent);
   else
     driver = std::make_shared<DynamicErrorDriver>(iod, comm);

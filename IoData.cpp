@@ -237,6 +237,7 @@ void SpatialInterpolationData::setup(const char *name, ClassAssigner *father)
 
 DynamicLoadCalculatorData::DynamicLoadCalculatorData()
 {
+  mode     = LOAD;
   type     = NONE;
   verbose  = LOW;
   pressure = 1e5;
@@ -246,9 +247,13 @@ DynamicLoadCalculatorData::DynamicLoadCalculatorData()
 
 void DynamicLoadCalculatorData::setup(const char *name, ClassAssigner *father)
 {
-  ClassAssigner *ca = new ClassAssigner(name, 5, father);
+  ClassAssigner *ca = new ClassAssigner(name, 6, father);
 
-  new ClassToken<DynamicLoadCalculatorData> (ca, "Type", this,
+  new ClassToken<DynamicLoadCalculatorData>(ca, "Mode", this,
+      reinterpret_cast<int DynamicLoadCalculatorData::*>(&DynamicLoadCalculatorData::mode), 2,
+      "Load", 0, "Error", 1);
+
+  new ClassToken<DynamicLoadCalculatorData>(ca, "Type", this,
      reinterpret_cast<int DynamicLoadCalculatorData::*>(&DynamicLoadCalculatorData::type), 4,
      "None", 0, "Constant", 1, "Closest", 2, "Interp", 3);
 
